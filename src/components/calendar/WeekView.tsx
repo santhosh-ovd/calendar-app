@@ -24,7 +24,7 @@ const WeekDaysHeader = styled(Box)(({ theme }) => ({
   zIndex: 2,
 }));
 
-const TimeGridContainer = styled(Box)(({ theme }) => ({
+const TimeGridContainer = styled(Box)(() => ({
   display: "grid",
   gridTemplateColumns: "80px repeat(7, 1fr)",
   flex: 1,
@@ -111,12 +111,6 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate, events }) => {
   const timeSlots = Array.from({ length: 24 }, (_, i) => {
     return addHours(startOfDay(currentDate), i);
   });
-
-  const formatTimeSlot = (time: Date) => {
-    const hour = format(time, "h").padStart(2, " ");
-    const meridiem = format(time, "a").toUpperCase();
-    return `${hour} ${meridiem}`;
-  };
 
   const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event);

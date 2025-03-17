@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, styled, Typography, Chip } from "@mui/material";
+import { Box, styled, Typography } from "@mui/material";
 import { format, addHours, startOfDay, parseISO } from "date-fns";
 import { CalendarEvent, EventGroup } from "./types";
 import EventListDialog from "./common/EventListDialog";

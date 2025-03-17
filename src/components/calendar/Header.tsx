@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Button, ButtonGroup, IconButton, Typography, styled } from "@mui/material";
-import { ChevronLeft, ChevronRight, Today, ViewDay, ViewWeek, ViewModule, ViewAgenda, Add } from "@mui/icons-material";
-import { ViewType } from "../types";
-import { format, addDays, addMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { ChevronLeft, ChevronRight, Today, Add } from "@mui/icons-material";
+import { ViewType } from "./types";
+import { format, addDays, addMonths, startOfWeek, endOfWeek } from "date-fns";
 
 const HeaderContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1, 1),

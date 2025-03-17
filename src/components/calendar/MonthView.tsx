@@ -20,7 +20,7 @@ const WeekDaysHeader = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
 }));
 
-const MonthGrid = styled(Box)(({ theme }) => ({
+const MonthGrid = styled(Box)(() => ({
   flex: 1,
   display: "grid",
   gridTemplateColumns: "repeat(7, 1fr)",

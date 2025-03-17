@@ -29,12 +29,10 @@ const GoogleCalendar = () => {
   const [view, setView] = useState<ViewType>('week');
 
   // Transform the events to ensure proper date handling
-  const transformedEvents = eventss.map(event => ({
+  const transformedEvents: any = eventss.map(event => ({
     ...event,
     score: event.score || {} // Ensure score is always an object
   }));
-
-  console.log("Transformed events:", transformedEvents);
 
   const renderView = () => {
     switch (view) {

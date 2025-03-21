@@ -45,14 +45,12 @@ const EventDetailDialog: React.FC<EventDetailDialogProps> = ({ selectedEvent, se
       <DialogTitle sx={{ 
         p: 2,
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         borderBottom: '1px solid',
         borderColor: 'divider',
       }}>
-        <Typography variant="h6">
-          Interview With: {selectedEvent.user_det.candidate.candidate_firstName}
-        </Typography>
+        
         <IconButton 
           size="small" 
           onClick={() => setSelectedEvent(null)}
@@ -63,7 +61,13 @@ const EventDetailDialog: React.FC<EventDetailDialogProps> = ({ selectedEvent, se
       </DialogTitle>
 
       <DialogContent sx={{ p: 2 }}>
+        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between',alignItems: 'center'}}>
         <Box>
+          <DetailRow>
+        <Typography variant="body2">
+          Interview With: {selectedEvent.user_det.candidate.candidate_firstName}
+        </Typography>
+          </DetailRow>
           <DetailRow>
             <Typography variant="body2">
               Position: {selectedEvent.job_id.jobRequest_Title}
@@ -99,7 +103,7 @@ const EventDetailDialog: React.FC<EventDetailDialogProps> = ({ selectedEvent, se
               startIcon={<VisibilityIcon />}
               endIcon={<FileDownloadIcon />}
               fullWidth
-              variant="contained"
+              variant="outlined"
               disableElevation
             >
               Resume.docx
@@ -109,14 +113,17 @@ const EventDetailDialog: React.FC<EventDetailDialogProps> = ({ selectedEvent, se
               startIcon={<VisibilityIcon />}
               endIcon={<FileDownloadIcon />}
               fullWidth
-              variant="contained"
+              variant="outlined"
               disableElevation
             >
               Aadhardcard
             </FileButton>
           </Box>
-
-          {selectedEvent.link && (
+        </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center',alignItems: 'center'}}>
+            {/* Image Icon  with google meet icon logo*/}
+            <img src="https://fonts.gstatic.com/s/i/productlogos/meet_2020q4/v1/web-96dp/logo_meet_2020q4_color_2x_web_96dp.png" alt="Google Logo" />
+            {selectedEvent.link && (
             <Box sx={{ mt: 2 }}>
               <Button 
                 href={selectedEvent.link}
@@ -136,6 +143,7 @@ const EventDetailDialog: React.FC<EventDetailDialogProps> = ({ selectedEvent, se
               </Button>
             </Box>
           )}
+          </Box>
         </Box>
       </DialogContent>
     </Dialog>

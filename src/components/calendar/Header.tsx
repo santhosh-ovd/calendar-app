@@ -101,7 +101,9 @@ const CalendarHeader: React.FC<HeaderProps> = ({ currentDate, view, onViewChange
               <ChevronRight />
             </IconButton>
           </ButtonGroup>
+        </Box>
 
+        <Box sx={{ ml: "auto" }}>
           <Typography variant="h6">{getHeaderTitle()}</Typography>
         </Box>
 

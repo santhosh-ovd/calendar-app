@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Box, Typography, styled, Chip } from "@mui/material";
+import { Box, Typography, styled } from "@mui/material";
 import { format, startOfMonth, isSameMonth, parseISO, isSameDay, startOfWeek, addDays } from "date-fns";
 import { CalendarEvent, EventGroup } from "./types";
 import EventListDialog from "./common/EventListDialog";
 import EventDetailDialog from "./common/EventDetailDialog";
+import { CountBadge } from "../ui/CountBadge";
 
 const MonthViewContainer = styled(Box)(({ theme }) => ({
   flex: 1,
@@ -34,30 +35,6 @@ const DayCell = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
   position: "relative",
   overflow: "hidden",
-}));
-
-const EventBlock = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  borderRadius: theme.shape.borderRadius,
-  padding: theme.spacing(0.5, 1),
-  marginBottom: theme.spacing(0.5),
-  fontSize: "0.75rem",
-  cursor: "pointer",
-  overflow: "hidden",
-  whiteSpace: "nowrap",
-  textOverflow: "ellipsis",
-  "&:hover": {
-    filter: "brightness(0.95)",
-  },
-}));
-
-const CountBadge = styled(Chip)(({ theme }) => ({
-  backgroundColor: "#FFD700",
-  color: theme.palette.common.black,
-  height: 20,
-  minWidth: 20,
-  marginLeft: theme.spacing(1),
 }));
 
 interface MonthViewProps {
@@ -109,12 +86,17 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events }) => {
   };
 
   const handleMultipleEventsClick = (events: CalendarEvent[], date: Date) => {
+    console.log(events, "events");
     if (events.length > 1) {
       setSelectedEvents({ time: format(date, "MMMM d, yyyy"), events });
     } else if (events.length === 1) {
       handleEventClick(events[0]);
     }
   };
+
+  const style = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
+  const positionStyle = { position: "absolute", height: "70px", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", borderRadius: "10px", margin: "0 5px" };
+  const boxStyle = { display: "flex", flexDirection: "column", justifyContent: "center", gap: 0.25 };
 
   return (
     <MonthViewContainer>
@@ -130,61 +112,34 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events }) => {
         {calendarDays.map((day) => {
           const eventGroups = getEventsGroupedByTime(day);
           const isCurrentMonth = isSameMonth(day, currentDate);
-          console.log(eventGroups,'eeeeee');
 
           return (
             <DayCell key={day.toString()} sx={{ bgcolor: isCurrentMonth ? "background.paper" : "action.hover" }}>
-              <Typography variant="body2" sx={{ color: isCurrentMonth ? "text.primary" : "text.secondary", mb: 1 }} >
+              <Typography variant="body2" sx={{ color: isCurrentMonth ? "text.primary" : "text.secondary", mb: 1 }}>
                 {format(day, "d")}
               </Typography>
 
-              {eventGroups.slice(0, 3).map((group) => (
-                <EventBlock key={group.time} onClick={() => handleMultipleEventsClick(group.events, day)} sx={{ position: "relative" }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                      {format(parseISO(group.events[0].start), "h:mm a")}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        flex: 1,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {group.events[0].job_id.jobRequest_Title}
-                    </Typography>
-                    {group.count > 1 && (
-                      <CountBadge
-                        label={group.count}
-                        size="small"
-                        sx={{
-                          position: "absolute",
-                          top: 2,
-                          right: 2,
-                          height: 16,
-                          minWidth: 16,
-                          fontSize: "0.65rem",
-                        }}
-                      />
-                    )}
-                  </Box>
-                </EventBlock>
-              ))}
-
-              {eventGroups.length > 3 && (
-                <Box sx={{ textAlign: "right", mt: 0.5 }}>
-                  <CountBadge
-                    label={`+${eventGroups.length - 3} more`}
-                    size="small"
-                    onClick={() =>
-                      handleMultipleEventsClick(
-                        eventGroups.slice(3).flatMap((g) => g.events),
-                        day
-                      )
-                    }
-                  />
+              {eventGroups?.map((item: any) => {
+                const event = item?.events[0]??{};
+                return(
+                <Box key={event.time} >
+                  {event && <Box sx={{ display: "flex", ...positionStyle, width: "100%", left: 0 }} onClick={() => handleMultipleEventsClick(item?.events, day)}>
+                    <Box sx={{ backgroundColor: "primary.main", width: "5%" }}></Box>
+                    <Box sx={{ ...boxStyle, width: "95%", padding: "4px" }}>
+                      {event.count > 1 && <CountBadge label={event.count} size="small" />}
+                      <Typography variant="caption" fontWeight="bold" sx={style}>
+                        {event?.job_id?.jobRequest_Title ?? "-"}
+                      </Typography>
+                      <Typography variant="caption" color="inherit" sx={style}>
+                        {`Interviewer: ${event?.user_det?.handled_by?.firstName ?? "-"}`}
+                      </Typography>
+                      <Typography variant="caption" sx={style}>
+                        {format(parseISO(event?.start), "h:mm a")} - {format(parseISO(event?.end), "h:mm a")}
+                      </Typography>
+                    </Box>
+                  </Box>}
                 </Box>
+              )}
               )}
             </DayCell>
           );
@@ -192,7 +147,6 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events }) => {
       </MonthGrid>
 
       <EventListDialog selectedEvents={selectedEvents} setSelectedEvents={setSelectedEvents} handleEventClick={handleEventClick} />
-
       <EventDetailDialog selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} />
     </MonthViewContainer>
   );

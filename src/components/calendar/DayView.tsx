@@ -46,28 +46,6 @@ const DayView: React.FC<DayViewProps> = ({ currentDate, events }) => {
     return format(eventDate, "yyyy-MM-dd") === format(currentDate, "yyyy-MM-dd");
   });
 
-  const calculateEventPosition = (event: CalendarEvent) => {
-    const startTime = parseISO(event.start);
-    const endTime = parseISO(event.end);
-
-    const startHour = startTime.getHours();
-    const startMinute = startTime.getMinutes();
-
-    // Calculate duration in minutes, but limit it to the same day
-    const endHour = endTime.getHours();
-    const endMinute = endTime.getMinutes();
-    const durationMinutes = Math.min(
-      (endHour - startHour) * 60 + (endMinute - startMinute),
-      // Limit max duration to end of day
-      (24 - startHour) * 60 - startMinute
-    );
-
-    return {
-      top: `${startHour * 60 + startMinute}px`,
-      height: `${Math.max(durationMinutes, 30)}px`, // Minimum height of 30px
-    };
-  };
-
   // Group events by time slot
   const getEventsForTimeSlot = (eventTime: Date) => {
     return todayEvents.filter((event) => {
@@ -101,7 +79,7 @@ const DayView: React.FC<DayViewProps> = ({ currentDate, events }) => {
       {/* Body of the events */}
       <TimeGridContainer>
         <TwentyFourHourColumn timeSlots={timeSlots} />
-        <EventCell timeSlots={timeSlots} getEventsForTimeSlot={getEventsForTimeSlot} calculateEventPosition={calculateEventPosition} handleMultipleEventsClick={handleMultipleEventsClick} />
+        <EventCell timeSlots={timeSlots} getEventsForTimeSlot={getEventsForTimeSlot} handleMultipleEventsClick={handleMultipleEventsClick} />
       </TimeGridContainer>
       {/* Dialog for multiple events */}
       <EventListDialog selectedEvents={selectedEvents} setSelectedEvents={setSelectedEvents} handleEventClick={handleEventClick} />

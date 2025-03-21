@@ -5,6 +5,8 @@ import { CalendarEvent, EventGroup } from "./types";
 import EventListDialog from "./common/EventListDialog";
 import EventDetailDialog from "./common/EventDetailDialog";
 import TwentyFourHourColumn from "./common/TwentyFourHourColumn";
+import { TimeSlot } from "../ui/TimeSlot";
+import { CountBadge } from "../ui/CountBadge";
 
 const WeekViewContainer = styled(Box)(({ theme }) => ({
   flex: 1,
@@ -36,15 +38,15 @@ const DayColumn = styled(Box)(({ theme }) => ({
   minWidth: 120,
 }));
 
-const TimeSlot = styled(Box)(({ theme }) => ({
-  height: 60,
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  position: "relative",
-  display: "flex",
-  alignItems: "start",
-  justifyContent: "flex-end",
-  paddingTop: theme.spacing(1),
-}));
+// const TimeSlot = styled(Box)(({ theme }) => ({
+//   height: 100,
+//   borderBottom: `1px solid ${theme.palette.divider}`,
+//   position: "relative",
+//   display: "flex",
+//   alignItems: "start",
+//   justifyContent: "flex-end",
+//   paddingTop: theme.spacing(1),
+// }));
 
 const EventCard = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -56,17 +58,6 @@ const EventCard = styled(Box)(({ theme }) => ({
   "&:hover": {
     filter: "brightness(0.95)",
   },
-}));
-
-const CountBadge = styled(Chip)(({ theme }) => ({
-  backgroundColor: "#FFD700",
-  color: theme.palette.common.black,
-  position: "absolute",
-  top: theme.spacing(0.5),
-  right: theme.spacing(0.5),
-  height: 20,
-  minWidth: 20,
-  borderRadius: "50%",
 }));
 
 interface WeekViewProps {
@@ -134,7 +125,7 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate, events }) => {
       <WeekDaysHeader>
         <Box /> {/* Empty cell for time column */}
         {weekDays.map((day) => (
-          <Box key={day.toString()} sx={{ p: 1, textAlign: "center",borderRight: "1px solid",borderColor: "divider",}}>
+          <Box key={day.toString()} sx={{ p: 1, textAlign: "center", borderRight: "1px solid", borderColor: "divider" }}>
             <Typography variant="caption" display="block">
               {format(day, "EEE")}
             </Typography>
@@ -146,7 +137,7 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate, events }) => {
       {/* Body of the events */}
       <TimeGridContainer>
         <TwentyFourHourColumn timeSlots={timeSlots} />
-        <EventCell weekDays={weekDays} timeSlots={timeSlots} getEventsForTimeSlot={getEventsForTimeSlot} handleMultipleEventsClick={handleMultipleEventsClick} />
+        <Events weekDays={weekDays} timeSlots={timeSlots} getEventsForTimeSlot={getEventsForTimeSlot} handleMultipleEventsClick={handleMultipleEventsClick} />
       </TimeGridContainer>
       <EventListDialog selectedEvents={selectedEvents} setSelectedEvents={setSelectedEvents} handleEventClick={handleEventClick} />
       <EventDetailDialog selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} />
@@ -156,29 +147,38 @@ const WeekView: React.FC<WeekViewProps> = ({ currentDate, events }) => {
 
 export default WeekView;
 
-const EventCell = (props: any) => {
+const Events = (props: any) => {
   const { weekDays, timeSlots, getEventsForTimeSlot, handleMultipleEventsClick } = props;
+  const style = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
+  const positionStyle = { position: "absolute", height: "58px", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", borderRadius: "5px", margin: "0 5px" };
+  const boxStyle = { display: "flex", flexDirection: "column", justifyContent: "center", gap: 0.25 };
+
   return (
     <>
       {weekDays.map((day: any) => (
         <DayColumn key={day.toString()}>
           {timeSlots.map((time: any) => {
+            
             const eventGroup = getEventsForTimeSlot(day, time);
+            const event = eventGroup?.events[0];
+
             return (
               <TimeSlot key={time.toString()}>
-                {eventGroup && (
-                  <EventCard onClick={() => handleMultipleEventsClick(eventGroup.events)}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                      <Typography variant="caption" fontWeight="bold">
-                        {eventGroup.events[0].job_id.jobRequest_Title}
+                  {eventGroup && <Box sx={{ display: "flex", width: "95%",...positionStyle,left: "0px",right: "0px"}} onClick={() => handleMultipleEventsClick(eventGroup.events)}>
+                    <Box sx={{ backgroundColor: "primary.main", width: "5%" }}></Box>
+                    <Box sx={{ ...boxStyle, width: "95%", padding: "4px" }}>
+                      {eventGroup?.count > 1 && <CountBadge label={eventGroup.count} size="small" />}
+                      <Typography variant="caption" fontWeight="bold" sx={style}>
+                        {event?.job_id?.jobRequest_Title ?? "-"}
                       </Typography>
-                      {eventGroup.count > 1 && <CountBadge label={eventGroup.count} />}
+                      <Typography variant="caption" color="inherit" sx={style}>
+                        {`Interviewer: ${event?.user_det?.handled_by?.firstName ?? "-"}`}
+                      </Typography>
+                      <Typography variant="caption" sx={style}>
+                        {format(parseISO(event?.start), "h:mm a")} - {format(parseISO(event?.end), "h:mm a")}
+                      </Typography>
                     </Box>
-                    <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
-                      {eventGroup.events[0].summary}
-                    </Typography>
-                  </EventCard>
-                )}
+                  </Box>}
               </TimeSlot>
             );
           })}

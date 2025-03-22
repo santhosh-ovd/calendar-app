@@ -11,8 +11,27 @@ const EventsColumn = styled(Box)(({ theme }) => ({
 const EventCell = (props: any) => {
   const { timeSlots, getEventsForTimeSlot, handleMultipleEventsClick } = props;
   const style = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
-  const positionStyle = {position: "absolute",height: "70px",boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",borderRadius: "10px",margin: "0 5px"};
-  const boxStyle = { display: "flex", flexDirection: "column",justifyContent: "center", gap: 0.25 };
+  
+  // Calculate position based on minutes
+  const calculateEventPosition = (event: any) => {
+    const startTime = parseISO(event.start);
+    const minutes = startTime.getMinutes()*2;
+    return {
+      top: `${minutes}px`,
+      position: "absolute",
+      height: "70px",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+      borderRadius: "10px",
+      margin: "0 5px"
+    };
+  };
+
+  const boxStyle = { 
+    display: "flex", 
+    flexDirection: "column",
+    justifyContent: "center", 
+    gap: 0.25 
+  };
 
   return (
     <EventsColumn>
@@ -23,7 +42,15 @@ const EventCell = (props: any) => {
         return (
           <TimeSlot key={timeSlot.toString()}>
             {event && (
-              <Box sx={{ display: "flex", ...positionStyle, width: "20%" ,left:0}} onClick={() => handleMultipleEventsClick(eventsAtTime)}>
+              <Box 
+                sx={{ 
+                  display: "flex", 
+                  width: "20%",
+                  left: 0,
+                  ...calculateEventPosition(event)
+                }} 
+                onClick={() => handleMultipleEventsClick(eventsAtTime)}
+              >
                 <Box sx={{ backgroundColor: "primary.main", width: "5%" }}></Box>
                 <Box sx={{ ...boxStyle, width: "95%", padding: "4px" }}>
                   {eventsAtTime.length > 1 && <CountBadge label={eventsAtTime.length} size="small" />}

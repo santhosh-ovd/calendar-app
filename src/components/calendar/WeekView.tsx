@@ -150,24 +150,54 @@ export default WeekView;
 const Events = (props: any) => {
   const { weekDays, timeSlots, getEventsForTimeSlot, handleMultipleEventsClick } = props;
   const style = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
-  const positionStyle = { position: "absolute", height: "58px", boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", borderRadius: "5px", margin: "0 5px" };
-  const boxStyle = { display: "flex", flexDirection: "column", justifyContent: "center", gap: 0.25 };
+  
+  // Calculate position based on minutes
+  const calculateEventPosition = (event: any) => {
+    const startTime = parseISO(event.start);
+    const minutes = startTime.getMinutes() * 2; // Multiply by 2 to match the time slot height
+    return {
+      position: "absolute",
+      top: `${minutes}px`,
+      height: "58px",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+      borderRadius: "5px",
+      margin: "0 5px"
+    };
+  };
+
+  const boxStyle = { 
+    display: "flex", 
+    flexDirection: "column", 
+    justifyContent: "center", 
+    gap: 0.25 
+  };
 
   return (
     <>
       {weekDays.map((day: any) => (
         <DayColumn key={day.toString()}>
           {timeSlots.map((time: any) => {
-            
             const eventGroup = getEventsForTimeSlot(day, time);
             const event = eventGroup?.events[0];
 
             return (
               <TimeSlot key={time.toString()}>
-                  {eventGroup && <Box sx={{ display: "flex", width: "95%",...positionStyle,left: "0px",right: "0px"}} onClick={() => handleMultipleEventsClick(eventGroup.events)}>
+                {eventGroup && (
+                  <Box 
+                    sx={{ 
+                      display: "flex", 
+                      width: "95%",
+                      left: "0px",
+                      right: "0px",
+                      ...calculateEventPosition(event)
+                    }} 
+                    onClick={() => handleMultipleEventsClick(eventGroup.events)}
+                  >
                     <Box sx={{ backgroundColor: "primary.main", width: "5%" }}></Box>
                     <Box sx={{ ...boxStyle, width: "95%", padding: "4px" }}>
-                      {eventGroup?.count > 1 && <CountBadge label={eventGroup.count} size="small" />}
+                      {eventGroup?.count > 1 && (
+                        <CountBadge label={eventGroup.count} size="small" />
+                      )}
                       <Typography variant="caption" fontWeight="bold" sx={style}>
                         {event?.job_id?.jobRequest_Title ?? "-"}
                       </Typography>
@@ -178,7 +208,8 @@ const Events = (props: any) => {
                         {format(parseISO(event?.start), "h:mm a")} - {format(parseISO(event?.end), "h:mm a")}
                       </Typography>
                     </Box>
-                  </Box>}
+                  </Box>
+                )}
               </TimeSlot>
             );
           })}

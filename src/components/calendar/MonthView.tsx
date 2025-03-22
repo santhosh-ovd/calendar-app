@@ -126,7 +126,7 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events }) => {
                   {event && <Box sx={{ display: "flex", ...positionStyle, width: "100%", left: 0 }} onClick={() => handleMultipleEventsClick(item?.events, day)}>
                     <Box sx={{ backgroundColor: "primary.main", width: "5%" }}></Box>
                     <Box sx={{ ...boxStyle, width: "95%", padding: "4px" }}>
-                      {event.count > 1 && <CountBadge label={event.count} size="small" />}
+                      {item.count > 1 && <CountBadge label={item.count} size="small" />}
                       <Typography variant="caption" fontWeight="bold" sx={style}>
                         {event?.job_id?.jobRequest_Title ?? "-"}
                       </Typography>

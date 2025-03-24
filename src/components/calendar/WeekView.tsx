@@ -151,14 +151,23 @@ const Events = (props: any) => {
   const { weekDays, timeSlots, getEventsForTimeSlot, handleMultipleEventsClick } = props;
   const style = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
   
-  // Calculate position based on minutes
+  // Calculate position and height based on start and end times
   const calculateEventPosition = (event: any) => {
     const startTime = parseISO(event.start);
-    const minutes = startTime.getMinutes() * 2; // Multiply by 2 to match the time slot height
+    const endTime = parseISO(event.end);
+    
+    // Calculate start position
+    const startMinutes = startTime.getMinutes() * 2;
+    
+    // Calculate duration in minutes
+    const durationInMinutes = 
+      (endTime.getHours() - startTime.getHours()) * 120 + // Hours difference * 120 (60 mins * 2)
+      (endTime.getMinutes() - startTime.getMinutes()) * 2; // Minutes difference * 2
+    
     return {
       position: "absolute",
-      top: `${minutes}px`,
-      height: "58px",
+      top: `${startMinutes}px`,
+      height: `${Math.max(durationInMinutes, 58)}px`, // Minimum height of 58px
       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
       borderRadius: "5px",
       margin: "0 5px"
@@ -189,12 +198,13 @@ const Events = (props: any) => {
                       width: "95%",
                       left: "0px",
                       right: "0px",
-                      ...calculateEventPosition(event)
+                      ...calculateEventPosition(event),
+                      zIndex: 10000,
                     }} 
                     onClick={() => handleMultipleEventsClick(eventGroup.events)}
                   >
                     <Box sx={{ backgroundColor: "primary.main", width: "5%" }}></Box>
-                    <Box sx={{ ...boxStyle, width: "95%", padding: "4px" }}>
+                    <Box sx={{ ...boxStyle, width: "95%", padding: "4px", backgroundColor: "white"}} >
                       {eventGroup?.count > 1 && (
                         <CountBadge label={eventGroup.count} size="small" />
                       )}

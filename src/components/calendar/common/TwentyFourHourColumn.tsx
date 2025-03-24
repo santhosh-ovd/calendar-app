@@ -10,7 +10,7 @@ const TimeColumn = styled(Box)(({ theme }) => ({
 }));
 
 const TimeSlot = styled(Box)(({ theme }) => ({
-  height: 100,
+  height: 120,
   borderBottom: `1px solid ${theme.palette.divider}`,
   position: "relative",
   display: "flex",

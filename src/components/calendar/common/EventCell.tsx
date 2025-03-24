@@ -1,6 +1,6 @@
 import { CountBadge } from "@/components/ui/CountBadge";
 import { TimeSlot } from "@/components/ui/TimeSlot";
-import { Box, styled, Typography, Chip } from "@mui/material";
+import { Box, styled, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
 
 const EventsColumn = styled(Box)(({ theme }) => ({
@@ -12,16 +12,25 @@ const EventCell = (props: any) => {
   const { timeSlots, getEventsForTimeSlot, handleMultipleEventsClick } = props;
   const style = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
   
-  // Calculate position based on minutes
+  // Calculate position and height based on start and end times
   const calculateEventPosition = (event: any) => {
     const startTime = parseISO(event.start);
-    const minutes = startTime.getMinutes()*2;
+    const endTime = parseISO(event.end);
+    
+    // Calculate start position
+    const startMinutes = startTime.getMinutes() * 2;
+    
+    // Calculate duration in minutes
+    const durationInMinutes = 
+      (endTime.getHours() - startTime.getHours()) * 120 + // Hours difference * 120 (60 mins * 2)
+      (endTime.getMinutes() - startTime.getMinutes()) * 2; // Minutes difference * 2
+    
     return {
-      top: `${minutes}px`,
       position: "absolute",
-      height: "70px",
+      top: `${startMinutes}px`,
+      height: `${Math.max(durationInMinutes, 58)}px`, // Minimum height of 58px
       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-      borderRadius: "10px",
+      borderRadius: "5px",
       margin: "0 5px"
     };
   };
@@ -47,13 +56,16 @@ const EventCell = (props: any) => {
                   display: "flex", 
                   width: "20%",
                   left: 0,
-                  ...calculateEventPosition(event)
+                  ...calculateEventPosition(event),
+                  zIndex: 10000,
                 }} 
                 onClick={() => handleMultipleEventsClick(eventsAtTime)}
               >
                 <Box sx={{ backgroundColor: "primary.main", width: "5%" }}></Box>
-                <Box sx={{ ...boxStyle, width: "95%", padding: "4px" }}>
-                  {eventsAtTime.length > 1 && <CountBadge label={eventsAtTime.length} size="small" />}
+                <Box sx={{ ...boxStyle, width: "95%", padding: "4px", backgroundColor: "white" }}>
+                  {eventsAtTime.length > 1 && (
+                    <CountBadge label={eventsAtTime.length} size="small" />
+                  )}
                   <Typography variant="caption" fontWeight="bold" sx={style}>
                     {event?.job_id?.jobRequest_Title ?? "-"}
                   </Typography>
